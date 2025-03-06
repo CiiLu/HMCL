@@ -42,6 +42,8 @@ import javafx.util.Duration;
 import org.jackhuang.hmcl.Launcher;
 import org.jackhuang.hmcl.auth.authlibinjector.AuthlibInjectorDnD;
 import org.jackhuang.hmcl.setting.EnumBackgroundImage;
+import org.jackhuang.hmcl.setting.EnumThemeMode;
+import org.jackhuang.hmcl.setting.Theme;
 import org.jackhuang.hmcl.task.Schedulers;
 import org.jackhuang.hmcl.ui.Controllers;
 import org.jackhuang.hmcl.ui.FXUtils;
@@ -135,6 +137,9 @@ public class DecoratorController {
         config().backgroundImageTypeProperty().addListener(weakListener);
         config().backgroundImageProperty().addListener(weakListener);
         config().backgroundImageUrlProperty().addListener(weakListener);
+        config().themeModeProperty().addListener((a, b, newValue) -> {
+            Controllers.getScene().getStylesheets().setAll(Theme.getTheme().getStylesheets(config().getLauncherFontFamily()));
+        });
 
         // pass key events to current dialog / current page
         decorator.addEventFilter(KeyEvent.ANY, e -> {
@@ -241,7 +246,7 @@ public class DecoratorController {
                 return image;
         }
 
-        return newBuiltinImage("/assets/img/background.jpg");
+        return newBuiltinImage(config().getThemeMode()== EnumThemeMode.DARK?"/assets/img/background-dark.jpg":"/assets/img/background.jpg");
     }
 
     private @Nullable Image randomImageIn(Path imageDir) {

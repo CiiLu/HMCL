@@ -35,6 +35,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import org.jackhuang.hmcl.setting.EnumBackgroundImage;
+import org.jackhuang.hmcl.setting.EnumThemeMode;
 import org.jackhuang.hmcl.setting.Theme;
 import org.jackhuang.hmcl.ui.Controllers;
 import org.jackhuang.hmcl.ui.FXUtils;
@@ -94,6 +95,7 @@ public class PersonalizationPage extends StackPane {
             animationButton.selectedProperty().bindBidirectional(config().animationDisabledProperty());
             animationButton.setTitle(i18n("settings.launcher.turn_off_animations"));
         }
+
         content.getChildren().addAll(ComponentList.createComponentListTitle(i18n("settings.launcher.appearance")), themeList);
 
         {
@@ -127,7 +129,23 @@ public class PersonalizationPage extends StackPane {
             componentList.getContent().add(backgroundItem);
             content.getChildren().addAll(ComponentList.createComponentListTitle(i18n("launcher.background")), componentList);
         }
+        {
+            ComponentList componentList = new ComponentList();
 
+            MultiFileItem<EnumThemeMode> themeModeItem = new MultiFileItem<>();
+            ComponentSublist themeModeSublist = new ComponentSublist();
+            themeModeSublist.getContent().add(themeModeItem);
+
+            themeModeItem.loadChildren(Arrays.asList(
+                    new MultiFileItem.Option<>(i18n("launcher.thememode.system"), EnumThemeMode.SYSTEM),
+                    new MultiFileItem.Option<>(i18n("launcher.thememode.light"), EnumThemeMode.LIGHT),
+                    new MultiFileItem.Option<>(i18n("launcher.thememode.dark"), EnumThemeMode.DARK)
+            ));
+            themeModeItem.selectedDataProperty().bindBidirectional(config().themeModeProperty());
+
+            componentList.getContent().add(themeModeItem);
+            content.getChildren().addAll(ComponentList.createComponentListTitle(i18n("launcher.thememode")), componentList);
+        }
         {
             ComponentList logPane = new ComponentSublist();
             logPane.setTitle(i18n("settings.launcher.log"));

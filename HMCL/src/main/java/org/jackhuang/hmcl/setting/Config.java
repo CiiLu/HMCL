@@ -181,6 +181,9 @@ public final class Config implements Observable {
     @SerializedName("_version")
     private IntegerProperty configVersion = new SimpleIntegerProperty(0);
 
+    @SerializedName("themeMode")
+    private SimpleObjectProperty<EnumThemeMode> themeMode = new SimpleObjectProperty<>(EnumThemeMode.SYSTEM);
+
     /**
      * The version of UI that the user have last used.
      * If there is a major change in UI, {@link Config#CURRENT_UI_VERSION} should be increased.
@@ -670,5 +673,13 @@ public final class Config implements Observable {
 
     public ObservableMap<String, Object> getShownTips() {
         return shownTips;
+    }
+
+    public EnumThemeMode getThemeMode() {
+        return themeMode.get();
+    }
+
+    public ObjectProperty<EnumThemeMode> themeModeProperty() {
+        return themeMode;
     }
 }
