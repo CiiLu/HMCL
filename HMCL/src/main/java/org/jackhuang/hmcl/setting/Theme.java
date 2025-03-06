@@ -178,7 +178,7 @@ public class Theme {
     }
 
     public String[] getStylesheets(String overrideFontFamily) {
-        String css = config().getThemeMode()==EnumThemeMode.DARK?"/assets/css_dark/blue.css":"/assets/css/blue.css";
+        String css = "/assets/css/blue.css";
 
         String fontFamily = overrideFontFamily == null
                 ? System.getProperty("hmcl.font.override", System.getenv("HMCL_FONT"))
@@ -240,7 +240,7 @@ public class Theme {
                 }
         }
 
-        return new String[]{css, config().getThemeMode()==EnumThemeMode.DARK?"/assets/css_dark/root.css":"/assets/css/root.css"};
+        return new String[]{css, config().getThemeMode()==EnumThemeMode.DARK? "/assets/css/root_dark.css" :"/assets/css/root.css"};
     }
 
     public static Theme custom(String color) {
