@@ -18,6 +18,7 @@
 package org.jackhuang.hmcl.ui.main;
 
 import com.jfoenix.controls.JFXButton;
+import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXTextField;
 import com.jfoenix.effects.JFXDepthManager;
 import javafx.application.Platform;
@@ -36,6 +37,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import org.jackhuang.hmcl.setting.EnumBackgroundImage;
 import org.jackhuang.hmcl.setting.EnumThemeMode;
+import org.jackhuang.hmcl.setting.LauncherVisibility;
 import org.jackhuang.hmcl.setting.Theme;
 import org.jackhuang.hmcl.ui.Controllers;
 import org.jackhuang.hmcl.ui.FXUtils;
@@ -45,8 +47,10 @@ import org.jackhuang.hmcl.util.Lang;
 import org.jackhuang.hmcl.util.javafx.SafeStringConverter;
 
 import java.util.Arrays;
+import java.util.Locale;
 
 import static org.jackhuang.hmcl.setting.ConfigHolder.config;
+import static org.jackhuang.hmcl.ui.FXUtils.stringConverter;
 import static org.jackhuang.hmcl.util.i18n.I18n.i18n;
 
 public class PersonalizationPage extends StackPane {
@@ -82,6 +86,25 @@ public class PersonalizationPage extends StackPane {
             });
             themeColorPickerContainer.getChildren().setAll(picker);
             Platform.runLater(() -> JFXDepthManager.setDepth(picker, 0));
+        }
+        {
+            StackPane themeModeContainer = new StackPane();
+
+            JFXComboBox<EnumThemeMode> choThemeMode;
+            BorderPane themeModePane = new BorderPane();
+            Label label = new Label(i18n("launcher.thememode"));
+            themeModePane.setLeft(label);
+            BorderPane.setAlignment(label, Pos.CENTER_LEFT);
+
+            choThemeMode = new JFXComboBox<>();
+            themeModePane.setRight(choThemeMode);
+            BorderPane.setAlignment(choThemeMode, Pos.CENTER_RIGHT);
+            choThemeMode.getItems().setAll(EnumThemeMode.values());
+            choThemeMode.setConverter(stringConverter(e -> i18n("launcher.thememode." + e.name().toLowerCase(Locale.ROOT))));
+            FXUtils.setLimitWidth(choThemeMode, 150);
+            FXUtils.bindEnum(choThemeMode, config().themeModeProperty());
+            themeModeContainer.getChildren().setAll(themeModePane);
+            themeList.getContent().add(themeModeContainer);
         }
         {
             OptionToggleButton titleTransparentButton = new OptionToggleButton();
@@ -129,23 +152,7 @@ public class PersonalizationPage extends StackPane {
             componentList.getContent().add(backgroundItem);
             content.getChildren().addAll(ComponentList.createComponentListTitle(i18n("launcher.background")), componentList);
         }
-        {
-            ComponentList componentList = new ComponentList();
 
-            MultiFileItem<EnumThemeMode> themeModeItem = new MultiFileItem<>();
-            ComponentSublist themeModeSublist = new ComponentSublist();
-            themeModeSublist.getContent().add(themeModeItem);
-
-            themeModeItem.loadChildren(Arrays.asList(
-                    new MultiFileItem.Option<>(i18n("launcher.thememode.system"), EnumThemeMode.SYSTEM),
-                    new MultiFileItem.Option<>(i18n("launcher.thememode.light"), EnumThemeMode.LIGHT),
-                    new MultiFileItem.Option<>(i18n("launcher.thememode.dark"), EnumThemeMode.DARK)
-            ));
-            themeModeItem.selectedDataProperty().bindBidirectional(config().themeModeProperty());
-
-            componentList.getContent().add(themeModeItem);
-            content.getChildren().addAll(ComponentList.createComponentListTitle(i18n("launcher.thememode")), componentList);
-        }
         {
             ComponentList logPane = new ComponentSublist();
             logPane.setTitle(i18n("settings.launcher.log"));

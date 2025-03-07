@@ -262,13 +262,13 @@
 }
 
 .two-line-list-item > .first-line > .title {
-	-fx-text-fill: #292929;
+	-fx-text-fill: #ffffff;
 	-fx-font-size: 15px;
     -fx-padding: 0 8 0 0;
 }
 
 .two-line-list-item > HBox > .subtitle {
-	-fx-text-fill: rgba(0, 0, 0, 0.5);
+	-fx-text-fill: rgba(178, 178, 178, 0.5);
     -fx-font-weight: normal;
     -fx-font-size: 12px;
 }
@@ -1313,11 +1313,11 @@
 }
 
 .content-background {
-    -fx-background-color: rgba(244, 244, 244, 0.5);
+    -fx-background-color: rgba(17, 17, 17, 0.5);
 }
 
 .gray-background {
-    -fx-background-color: rgba(244, 244, 244, 0.5);
+    -fx-background-color: rgba(17, 17, 17, 0.5);
 }
 
 .white-background {

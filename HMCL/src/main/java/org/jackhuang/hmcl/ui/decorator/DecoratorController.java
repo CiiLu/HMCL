@@ -140,7 +140,6 @@ public class DecoratorController {
         config().themeModeProperty().addListener((a, b, newValue) -> {
             Controllers.getScene().getStylesheets().setAll(Theme.getTheme().getStylesheets(config().getLauncherFontFamily()));
             decorator.setContentBackground(getBackground());
-            System.out.println(Controllers.getScene().getStylesheets());
         });
 
         // pass key events to current dialog / current page

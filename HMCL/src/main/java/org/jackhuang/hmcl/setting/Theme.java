@@ -50,6 +50,7 @@ import static org.jackhuang.hmcl.util.logging.Logger.LOG;
 public class Theme {
     public static final Theme BLUE = new Theme("blue", "#5C6BC0");
     public static final Color BLACK = Color.web("#292929");
+    public static boolean useDarkTheme;
     public static final Color[] SUGGESTED_COLORS = new Color[]{
             Color.web("#3D6DA3"), // blue
             Color.web("#283593"), // dark blue
