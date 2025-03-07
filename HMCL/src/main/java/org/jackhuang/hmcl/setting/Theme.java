@@ -50,7 +50,6 @@ import static org.jackhuang.hmcl.util.logging.Logger.LOG;
 public class Theme {
     public static final Theme BLUE = new Theme("blue", "#5C6BC0");
     public static final Color BLACK = Color.web("#292929");
-    public static boolean useDarkTheme;
     public static final Color[] SUGGESTED_COLORS = new Color[]{
             Color.web("#3D6DA3"), // blue
             Color.web("#283593"), // dark blue
@@ -241,7 +240,7 @@ public class Theme {
                 }
         }
 
-        return new String[]{css, config().getThemeMode()==EnumThemeMode.DARK? "/assets/css/root_dark.css" :"/assets/css/root.css"};
+        return new String[]{css, config().isInDarkMode() ? "/assets/css/root_dark.css" :"/assets/css/root.css"};
     }
 
     public static Theme custom(String color) {

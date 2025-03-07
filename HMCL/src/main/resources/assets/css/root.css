@@ -17,7 +17,10 @@
  */
 .root {
 }
-
+#hyperlinkText {
+    -fx-font-size: 13px;
+    -fx-fill: #0070E0;
+}
 .svg {
     -fx-fill: black;
 }

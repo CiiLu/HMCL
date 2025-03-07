@@ -182,7 +182,7 @@ public final class Config implements Observable {
     private IntegerProperty configVersion = new SimpleIntegerProperty(0);
 
     @SerializedName("themeMode")
-    private SimpleObjectProperty<EnumThemeMode> themeMode = new SimpleObjectProperty<>(EnumThemeMode.SYSTEM);
+    private SimpleObjectProperty<EnumThemeMode> themeMode = new SimpleObjectProperty<>(EnumThemeMode.LIGHT);
 
     /**
      * The version of UI that the user have last used.
@@ -677,6 +677,9 @@ public final class Config implements Observable {
 
     public EnumThemeMode getThemeMode() {
         return themeMode.get();
+    }
+    public boolean isInDarkMode() {
+        return themeMode.get() == EnumThemeMode.DARK;
     }
 
     public ObjectProperty<EnumThemeMode> themeModeProperty() {

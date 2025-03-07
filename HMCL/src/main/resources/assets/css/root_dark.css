@@ -18,8 +18,13 @@
 .root {
 }
 
+#hyperlinkText {
+    -fx-font-size: 13px;
+    -fx-fill: #48a6ff;
+}
+
 .svg {
-    -fx-fill: white;
+    -fx-fill: #e3e3e3;
 }
 
 .scroll-bar .thumb {
@@ -133,8 +138,13 @@
     -fx-font-weight: BOLD;
 }
 
-.announcement JFXHyperlink, .announcement Text {
+.announcement Text {
     -fx-font-size: 13px;
+    -fx-fill: white;
+}
+
+.card.announcement .title .label {
+    -fx-text-fill: #cccccc;
 }
 
 .rippler-container {
@@ -214,6 +224,14 @@
     -fx-text-alignment: CENTER;
 }
 
+.class-title Text {
+    -fx-fill: #ffffff;
+}
+
+.class-title Rectangle {
+    -fx-fill: #dedede;
+}
+
 .class-title {
     -fx-font-size: 12px;
     -fx-padding: 16 16 8 16;
@@ -262,13 +280,13 @@
 }
 
 .two-line-list-item > .first-line > .title {
-	-fx-text-fill: #ffffff;
-	-fx-font-size: 15px;
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 15px;
     -fx-padding: 0 8 0 0;
 }
 
 .two-line-list-item > HBox > .subtitle {
-	-fx-text-fill: rgba(178, 178, 178, 0.5);
+    -fx-text-fill: rgba(178, 178, 178, 0.5);
     -fx-font-weight: normal;
     -fx-font-size: 12px;
 }
@@ -308,7 +326,7 @@
 
 .bubble > HBox > .two-line-list-item > .first-line > .title,
 .bubble > HBox > .two-line-list-item > HBox > .subtitle {
-	-fx-text-fill: white;
+    -fx-text-fill: white;
 }
 
 .sponsor-pane {
@@ -629,9 +647,9 @@
  *                                                                             *
  ******************************************************************************/
 
- .jfx-radio-button {
+.jfx-radio-button {
     -jfx-selected-color: -fx-base-check-color;
- }
+}
 
 .jfx-radio-button .radio {
     -fx-stroke-width: 2.0px;
@@ -873,11 +891,11 @@
 }
 
 .card {
-    -fx-background-color: rgba(255, 255, 255, 0.8);
+    -fx-background-color: rgba(24, 24, 24, 0.9);
     -fx-background-radius: 4;
     -fx-padding: 8px;
 
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.26), 10, 0.12, -1, 2);
+    -fx-effect: dropshadow(gaussian, rgba(55, 55, 55, 0.3), 10, 0.15, -1, 2);
 }
 
 .card-non-transparent {
@@ -1384,7 +1402,7 @@
 
 .scroll-pane > .viewport {
     -fx-background-color: null;
- }
+}
 
 .scroll-pane .scroll-bar {
     -fx-skin: "org.jackhuang.hmcl.ui.construct.FloatScrollBarSkin";

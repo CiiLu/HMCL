@@ -1124,8 +1124,8 @@ public final class FXUtils {
                             }
                             hyperlinkAction.accept(link);
                         });
+                        text.setId("hyperlinkText");
                         text.setCursor(Cursor.HAND);
-                        text.setFill(Color.web("#0070E0"));
                         text.setUnderline(true);
                         texts.add(text);
                     } else if ("b".equals(element.getTagName())) {
