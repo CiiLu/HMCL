@@ -125,18 +125,16 @@ public final class MainPage extends StackPane implements DecoratorPage {
             titleBar.getStyleClass().add("title");
             titleBar.setLeft(new Label(title));
 
-            Node hideNode = SVG.CLOSE.createIcon(Theme.blackFill(), 20);
-            hideNode.setCursor(Cursor.HAND);
-            titleBar.setRight(hideNode);
-            FXUtils.onClicked(hideNode, () -> {
-                if (announcementPane != null) {
-                    if (Metadata.isDev()) {
-                        config().getShownTips().put(ANNOUNCEMENT, Metadata.VERSION);
-                    }
-
+            if (!Metadata.isNightly()) {
+                JFXButton btnHide = new JFXButton();
+                btnHide.setOnAction(e -> {
                     announcementPane.setContent(new StackPane(), ContainerAnimations.FADE);
-                }
-            });
+                    config().getShownTips().put(ANNOUNCEMENT, Metadata.VERSION);
+                });
+                btnHide.getStyleClass().add("announcement-close-button");
+                btnHide.setGraphic(SVG.CLOSE.createIcon(Theme.blackFill(), 20));
+                titleBar.setRight(btnHide);
+            }
 
             TextFlow body = FXUtils.segmentToTextFlow(content, Controllers::onHyperlinkAction);
             body.setLineSpacing(4);
