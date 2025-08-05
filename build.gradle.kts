@@ -5,6 +5,7 @@ plugins {
 group = "org.jackhuang"
 version = "3.0"
 
+
 subprojects {
     apply {
         plugin("java")
