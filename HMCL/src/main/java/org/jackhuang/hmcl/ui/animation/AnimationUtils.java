@@ -37,7 +37,7 @@ public final class AnimationUtils {
     }
 
     private static final boolean ENABLED = !ConfigHolder.config().isAnimationDisabled();
-    private static final boolean PLAY_WINDOW_ANIMATION = ENABLED && !OperatingSystem.CURRENT_OS.isLinuxOrBSD();
+    private static final boolean PLAY_WINDOW_ANIMATION = !ConfigHolder.config().isUseSystemBorder() && ENABLED && !OperatingSystem.CURRENT_OS.isLinuxOrBSD();
 
     public static boolean isAnimationEnabled() {
         return ENABLED;

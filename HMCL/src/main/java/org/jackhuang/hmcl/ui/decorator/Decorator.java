@@ -43,6 +43,8 @@ import org.jackhuang.hmcl.ui.FXUtils;
 import org.jackhuang.hmcl.ui.animation.AnimationUtils;
 import org.jackhuang.hmcl.ui.wizard.Navigation;
 
+import static org.jackhuang.hmcl.setting.ConfigHolder.config;
+
 public class Decorator extends Control {
     private final ListProperty<Node> drawer = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final ListProperty<Node> content = new SimpleListProperty<>(FXCollections.observableArrayList());
@@ -74,7 +76,8 @@ public class Decorator extends Control {
 
         setBackground(new Background(new BackgroundFill(Color.TRANSPARENT, CornerRadii.EMPTY, Insets.EMPTY)));
 
-        primaryStage.initStyle(StageStyle.UNDECORATED);
+        if (!config().isUseSystemBorder())
+            primaryStage.initStyle(StageStyle.UNDECORATED);
 
         if (AnimationUtils.playWindowAnimation()) {
             FXUtils.onChange(primaryStage.iconifiedProperty(), iconified -> {

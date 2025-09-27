@@ -304,6 +304,21 @@ public final class Config implements Observable {
 
     // UI
 
+    @SerializedName("useSystemBorder")
+    private final BooleanProperty useSystemBorder = new SimpleBooleanProperty(true);
+
+    public BooleanProperty useSystemBorderProperty() {
+        return useSystemBorder;
+    }
+
+    public boolean isUseSystemBorder() {
+        return useSystemBorder.get();
+    }
+
+    public void setUseSystemBorder(boolean useSystemBorder) {
+        this.useSystemBorder.set(useSystemBorder);
+    }
+
     @SerializedName("theme")
     private final ObjectProperty<Theme> theme = new SimpleObjectProperty<>();
 

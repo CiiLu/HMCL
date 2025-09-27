@@ -34,11 +34,13 @@ import javafx.scene.effect.BlurType;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.*;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
-
 import org.jackhuang.hmcl.Metadata;
 import org.jackhuang.hmcl.setting.Theme;
 import org.jackhuang.hmcl.ui.FXUtils;
@@ -48,6 +50,8 @@ import org.jackhuang.hmcl.ui.animation.ContainerAnimations;
 import org.jackhuang.hmcl.ui.animation.TransitionPane;
 import org.jackhuang.hmcl.ui.wizard.Navigation;
 import org.jackhuang.hmcl.util.platform.OperatingSystem;
+
+import static org.jackhuang.hmcl.setting.ConfigHolder.config;
 
 public class DecoratorSkin extends SkinBase<Decorator> {
     private final StackPane root, parent;
@@ -73,60 +77,70 @@ public class DecoratorSkin extends SkinBase<Decorator> {
 
         Decorator skinnable = getSkinnable();
         root = new StackPane();
-        root.getStyleClass().add("window");
-
-        StackPane shadowContainer = new StackPane();
-        shadowContainer.getStyleClass().add("body");
-        shadowContainer.setEffect(new DropShadow(BlurType.ONE_PASS_BOX, Color.rgb(0, 0, 0, 0.4), 10, 0.3, 0.0, 0.0));
 
         parent = new StackPane();
-        Rectangle clip = new Rectangle();
-        clip.widthProperty().bind(parent.widthProperty());
-        clip.heightProperty().bind(parent.heightProperty());
-        clip.setArcWidth(8);
-        clip.setArcHeight(8);
-        parent.setClip(clip);
+
+        if (!config().isUseSystemBorder()) {
+            root.getStyleClass().add("window");
+            StackPane shadowContainer = new StackPane();
+            shadowContainer.getStyleClass().add("body");
+            shadowContainer.setEffect(new DropShadow(BlurType.ONE_PASS_BOX, Color.rgb(0, 0, 0, 0.4), 10, 0.3, 0.0, 0.0));
+            shadowContainer.getChildren().setAll(parent);
+            Rectangle clip = new Rectangle();
+            clip.widthProperty().bind(parent.widthProperty());
+            clip.heightProperty().bind(parent.heightProperty());
+            clip.setArcWidth(8);
+            clip.setArcHeight(8);
+            parent.setClip(clip);
+            shadowContainer.getChildren().setAll(parent);
+            root.getChildren().setAll(shadowContainer);
+        } else {
+            root.getChildren().setAll(parent);
+        }
+
 
         skinnable.getSnackbar().registerSnackbarContainer(parent);
 
-        EventHandler<MouseEvent> onMouseReleased = this::onMouseReleased;
-        EventHandler<MouseEvent> onMouseDragged = this::onMouseDragged;
-        EventHandler<MouseEvent> onMouseMoved = this::onMouseMoved;
-
-        // https://github.com/HMCL-dev/HMCL/issues/4290
-        if (OperatingSystem.CURRENT_OS != OperatingSystem.MACOS) {
-            onWindowsStatusChange = observable -> {
-                if (primaryStage.isIconified() || primaryStage.isFullScreen() || primaryStage.isMaximized()) {
-                    root.removeEventFilter(MouseEvent.MOUSE_RELEASED, onMouseReleased);
-                    root.removeEventFilter(MouseEvent.MOUSE_DRAGGED, onMouseDragged);
-                    root.removeEventFilter(MouseEvent.MOUSE_MOVED, onMouseMoved);
-                } else {
-                    root.addEventFilter(MouseEvent.MOUSE_RELEASED, onMouseReleased);
-                    root.addEventFilter(MouseEvent.MOUSE_DRAGGED, onMouseDragged);
-                    root.addEventFilter(MouseEvent.MOUSE_MOVED, onMouseMoved);
-                }
-            };
-            onTitleBarDoubleClick = event -> {
-                if (event.getButton() == MouseButton.PRIMARY && event.getClickCount() == 2) {
-                    primaryStage.setMaximized(!primaryStage.isMaximized());
-                    event.consume();
-                }
-            };
-            WeakInvalidationListener weakOnWindowsStatusChange = new WeakInvalidationListener(onWindowsStatusChange);
-            primaryStage.iconifiedProperty().addListener(weakOnWindowsStatusChange);
-            primaryStage.maximizedProperty().addListener(weakOnWindowsStatusChange);
-            primaryStage.fullScreenProperty().addListener(weakOnWindowsStatusChange);
-            onWindowsStatusChange.invalidated(null);
+        if (!config().isUseSystemBorder()) {
+            EventHandler<MouseEvent> onMouseReleased = this::onMouseReleased;
+            EventHandler<MouseEvent> onMouseDragged = this::onMouseDragged;
+            EventHandler<MouseEvent> onMouseMoved = this::onMouseMoved;
+            // https://github.com/HMCL-dev/HMCL/issues/4290
+            if (OperatingSystem.CURRENT_OS != OperatingSystem.MACOS) {
+                onWindowsStatusChange = observable -> {
+                    if (primaryStage.isIconified() || primaryStage.isFullScreen() || primaryStage.isMaximized()) {
+                        root.removeEventFilter(MouseEvent.MOUSE_RELEASED, onMouseReleased);
+                        root.removeEventFilter(MouseEvent.MOUSE_DRAGGED, onMouseDragged);
+                        root.removeEventFilter(MouseEvent.MOUSE_MOVED, onMouseMoved);
+                    } else {
+                        root.addEventFilter(MouseEvent.MOUSE_RELEASED, onMouseReleased);
+                        root.addEventFilter(MouseEvent.MOUSE_DRAGGED, onMouseDragged);
+                        root.addEventFilter(MouseEvent.MOUSE_MOVED, onMouseMoved);
+                    }
+                };
+                onTitleBarDoubleClick = event -> {
+                    if (event.getButton() == MouseButton.PRIMARY && event.getClickCount() == 2) {
+                        primaryStage.setMaximized(!primaryStage.isMaximized());
+                        event.consume();
+                    }
+                };
+                WeakInvalidationListener weakOnWindowsStatusChange = new WeakInvalidationListener(onWindowsStatusChange);
+                primaryStage.iconifiedProperty().addListener(weakOnWindowsStatusChange);
+                primaryStage.maximizedProperty().addListener(weakOnWindowsStatusChange);
+                primaryStage.fullScreenProperty().addListener(weakOnWindowsStatusChange);
+                onWindowsStatusChange.invalidated(null);
+            } else {
+                onWindowsStatusChange = null;
+                onTitleBarDoubleClick = null;
+                root.addEventFilter(MouseEvent.MOUSE_RELEASED, onMouseReleased);
+                root.addEventFilter(MouseEvent.MOUSE_DRAGGED, onMouseDragged);
+                root.addEventFilter(MouseEvent.MOUSE_MOVED, onMouseMoved);
+            }
         } else {
             onWindowsStatusChange = null;
             onTitleBarDoubleClick = null;
-            root.addEventFilter(MouseEvent.MOUSE_RELEASED, onMouseReleased);
-            root.addEventFilter(MouseEvent.MOUSE_DRAGGED, onMouseDragged);
-            root.addEventFilter(MouseEvent.MOUSE_MOVED, onMouseMoved);
         }
 
-        shadowContainer.getChildren().setAll(parent);
-        root.getChildren().setAll(shadowContainer);
 
         StackPane wrapper = new StackPane();
         BorderPane frame = new BorderPane();
@@ -247,7 +261,12 @@ public class DecoratorSkin extends SkinBase<Decorator> {
                 btnClose.getStyleClass().add("jfx-decorator-button");
                 btnClose.setOnAction(e -> skinnable.close());
 
-                buttonsContainer.getChildren().setAll(btnHelp, btnMin, btnClose);
+                if (config().isUseSystemBorder()) {
+                    buttonsContainer.getChildren().setAll(btnHelp);
+                } else {
+                    buttonsContainer.getChildren().setAll(btnHelp, btnMin, btnClose);
+                }
+
             }
             AnchorPane layer = new AnchorPane();
             layer.setPickOnBounds(false);

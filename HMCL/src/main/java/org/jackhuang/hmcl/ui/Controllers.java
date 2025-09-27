@@ -290,7 +290,8 @@ public final class Controllers {
 
         FXUtils.setIcon(stage);
         stage.setTitle(Metadata.FULL_TITLE);
-        stage.initStyle(StageStyle.TRANSPARENT);
+        if (!config().isUseSystemBorder())
+            stage.initStyle(StageStyle.TRANSPARENT);
         stage.setScene(scene);
 
         if (AnimationUtils.playWindowAnimation()) {

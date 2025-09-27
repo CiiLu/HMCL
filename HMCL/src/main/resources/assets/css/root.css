@@ -1333,7 +1333,7 @@
 
 .window {
     -fx-background-color: transparent;
-    -fx-padding: 8;
+    -fx-padding: 0;
 }
 
 .debug-border {
