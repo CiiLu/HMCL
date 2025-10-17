@@ -19,8 +19,8 @@ jobs:
         distribution: 'zulu'
         java-version: '17'
         java-package: 'jdk+fx'
-    - name: Build with Gradle
-      run: ./gradlew build --no-daemon
+    - name: Setup Gradle
+      uses: gradle/actions/setup-gradle@v5
       env:
         MICROSOFT_AUTH_ID: ${{ secrets.MICROSOFT_AUTH_ID }}
         MICROSOFT_AUTH_SECRET: ${{ secrets.MICROSOFT_AUTH_SECRET }}
