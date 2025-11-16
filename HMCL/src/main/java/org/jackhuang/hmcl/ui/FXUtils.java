@@ -131,6 +131,7 @@ public final class FXUtils {
     }
 
     /// @see Platform.Preferences
+    ///
     public static final @Nullable ObservableMap<String, Object> PREFERENCES;
     public static final @Nullable ObservableBooleanValue DARK_MODE;
     public static final @Nullable Boolean REDUCED_MOTION;
