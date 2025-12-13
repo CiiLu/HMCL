@@ -395,6 +395,7 @@ public class GameCrashWindow extends Stage {
                 reasonTitle.getStyleClass().add("two-line-item-second-large-title");
 
                 ScrollPane reasonPane = new ScrollPane(reasonTextFlow);
+                FXUtils.smoothScrolling(reasonPane);
                 reasonTextFlow.getStyleClass().add("crash-reason-text-flow");
                 reasonPane.setFitToWidth(true);
                 reasonPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
