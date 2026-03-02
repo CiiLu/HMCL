@@ -88,7 +88,7 @@ public final class FontManager {
 
         // Default
 
-        if (!(OperatingSystem.SYSTEM_VERSION.isAtLeast(OSVersion.WINDOWS_8))) {
+        if (OperatingSystem.SYSTEM_VERSION == OSVersion.WINDOWS_7) {
             return new Font("Microsoft Yahei", DEFAULT_FONT_SIZE);
         }
 
