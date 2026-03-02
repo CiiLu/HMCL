@@ -89,7 +89,10 @@ public final class FontManager {
         // Default
 
         if (OperatingSystem.SYSTEM_VERSION == OSVersion.WINDOWS_7) {
-            return new Font("Microsoft Yahei", DEFAULT_FONT_SIZE);
+            if (LocaleUtils.isChinese(LocaleUtils.SYSTEM_DEFAULT))
+                return new Font("Microsoft Yahei", DEFAULT_FONT_SIZE);
+            else
+                return new Font("Segoe UI", DEFAULT_FONT_SIZE);
         }
 
         String fcMatchPattern;
