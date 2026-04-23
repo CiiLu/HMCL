@@ -8,7 +8,7 @@
 <!-- #END BLOCK -->
 
 <!-- #BEGIN BLOCK -->
-<!-- #PROPERTY NAME=BADGES -->
+<!-- #PROPERTY NAME=BADGES -->’
 <div align="center">
 
 [![GitHub](https://img.shields.io/badge/GitHub-repo-blue?style=flat-square&logo=github)](https://github.com/HMCL-dev/HMCL)
