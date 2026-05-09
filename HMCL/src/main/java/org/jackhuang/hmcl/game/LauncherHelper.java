@@ -50,6 +50,7 @@ import org.jackhuang.hmcl.util.platform.*;
 import org.jackhuang.hmcl.util.platform.windows.WinReg;
 import org.jackhuang.hmcl.util.versioning.GameVersionNumber;
 import org.jackhuang.hmcl.util.versioning.VersionNumber;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -88,6 +89,8 @@ public final class LauncherHelper {
     private QuickPlayOption quickPlayOption;
     private boolean disableOfflineSkin = false;
     private boolean modifiedGpuReg = false;
+    @Nullable
+    private String javaPathGpuReg = null;
 
     public LauncherHelper(Profile profile, Account account, String selectedVersion) {
         this.profile = Objects.requireNonNull(profile);
@@ -235,19 +238,20 @@ public final class LauncherHelper {
                     }
 
                     if (config().isWindowsHighPerformance()) {
+                        javaPathGpuReg = FileUtils.getAbsolutePath(javaVersionRef.get().getBinary());
                         try {
                             WinReg reg = WinReg.INSTANCE;
                             if (reg != null) {
                                 Object current = reg.queryValue(
                                         WinReg.HKEY.HKEY_CURRENT_USER,
                                         "Software\\Microsoft\\DirectX\\UserGpuPreferences",
-                                        FileUtils.getAbsolutePath(javaVersionRef.get().getBinary())
+                                        javaPathGpuReg
                                 );
                                 if (!(current instanceof String)) {
                                     reg.setValue(
                                             WinReg.HKEY.HKEY_CURRENT_USER,
                                             "Software\\Microsoft\\DirectX\\UserGpuPreferences",
-                                            FileUtils.getAbsolutePath(javaVersionRef.get().getBinary()),
+                                            javaPathGpuReg,
                                             "GpuPreference=2;"
                                     );
                                     modifiedGpuReg = true;
@@ -901,16 +905,18 @@ public final class LauncherHelper {
         }
 
         private void finishLaunch() {
-            if (modifiedGpuReg) {
+            if (modifiedGpuReg && javaPathGpuReg != null) {
                 try {
                     Thread.sleep(5000L);
                 } catch (InterruptedException ignored) {
+                    Thread.currentThread().interrupt();
                 }
+
                 try {
                     WinReg.INSTANCE.deleteValue(
                             WinReg.HKEY.HKEY_CURRENT_USER,
                             "Software\\Microsoft\\DirectX\\UserGpuPreferences",
-                            process.getProcess().info().command().orElseThrow()
+                            javaPathGpuReg
                     );
                 } catch (Exception e) {
                     LOG.warning("Failed to revert high performance GPU preference", e);
