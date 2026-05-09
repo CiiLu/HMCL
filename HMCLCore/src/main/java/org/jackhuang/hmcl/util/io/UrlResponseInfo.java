@@ -1,6 +1,6 @@
 /*
  * Hello Minecraft! Launcher
- * Copyright (C) 2020  huangyuhui <huanghongxun2008@126.com> and contributors
+ * Copyright (C) 2025 huangyuhui <huanghongxun2008@126.com> and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,16 +15,19 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package org.jackhuang.hmcl.mod;
+package org.jackhuang.hmcl.util.io;
 
-public enum ModLoaderType {
-    UNKNOWN,
-    FORGE,
-    CLEANROOM,
-    NEO_FORGE,
-    FABRIC,
-    QUILT,
-    LITE_LOADER,
-    LEGACY_FABRIC,
-    PACK
+import java.net.URI;
+import java.net.http.HttpHeaders;
+import java.net.http.HttpResponse;
+
+/// @author Glavo
+public record UrlResponseInfo(URI uri, HttpHeaders headers) {
+    public static UrlResponseInfo of(HttpResponse<?> httpResponse) {
+        return new UrlResponseInfo(httpResponse.uri(), httpResponse.headers());
+    }
+
+    public static UrlResponseInfo of(URI uri, HttpResponse.ResponseInfo info) {
+        return new UrlResponseInfo(uri, info.headers());
+    }
 }
