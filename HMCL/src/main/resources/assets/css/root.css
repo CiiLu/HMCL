@@ -1949,6 +1949,10 @@
     -fx-padding: 0;
 }
 
+.no-padding .line-component-container {
+    -fx-padding: 0 16 0 16;
+}
+
 .line-component:large-title .title-label {
     -fx-font-size: 15px;
 }
