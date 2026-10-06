@@ -46,25 +46,18 @@ import org.jetbrains.annotations.Nullable;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static org.jackhuang.hmcl.util.i18n.I18n.i18n;
 import static org.jackhuang.hmcl.util.logging.Logger.LOG;
 
-/// The page showing the content of a patch pack archive and starting its installation.
-///
-/// The archive is read asynchronously, and the install button stays disabled until its information
-/// file has been parsed successfully.
 @NotNullByDefault
 public final class LocalPatchPackPage extends SpinnerPane implements WizardPage {
-
-    /// The key of the charset used to decode the archive entry names in the wizard settings.
     static final SettingsMap.Key<Charset> PATCH_PACK_CHARSET = new SettingsMap.Key<>("PATCH_PACK_CHARSET");
 
     private final WizardController controller;
 
-    /// Creates the patch pack information page for the archive stored in the wizard settings.
-    ///
-    /// @param controller the wizard controller
     public LocalPatchPackPage(WizardController controller) {
         this.controller = controller;
 
@@ -88,63 +81,52 @@ public final class LocalPatchPackPage extends SpinnerPane implements WizardPage 
 
         Path file = controller.getSettings().get(PatchPackInstallWizardProvider.PATCH_PACK_FILE);
         if (file == null) {
-            // This page is only reachable through the selection page, so a missing archive means
-            // that the wizard was navigated to incorrectly.
             Controllers.dialog(i18n("patchpack.failed"), i18n("message.error"), MessageDialogPane.MessageType.ERROR);
-            Platform.runLater(controller::onEnd);
+            FXUtils.runInFX(controller::onEnd);
             pane.getChildren().setAll(componentList);
             setContent(pane);
             return;
         }
 
         showSpinner();
-        Task.supplyAsync(() -> PatchPackHelper.findSuitableEncoding(file))
-                .thenApplyAsync(encoding -> new LoadedPatchPack(encoding, PatchPackHelper.readPatchPackInfo(file, encoding)))
-                .whenComplete(Schedulers.javafx(), (loaded, exception) -> {
-                    hideSpinner();
+        Task.supplyAsync(() -> PatchPackHelper.findSuitableEncoding(file)).thenApplyAsync(encoding -> new LoadedPatchPack(encoding, PatchPackHelper.readPatchPackInfo(file, encoding))).whenComplete(Schedulers.javafx(), (loaded, exception) -> {
+            hideSpinner();
 
-                    if (exception != null || loaded == null) {
-                        LOG.warning("Failed to read patch pack " + file, exception);
-                        Controllers.dialog(i18n("patchpack.failed"), i18n("message.error"), MessageDialogPane.MessageType.ERROR);
-                        Platform.runLater(controller::onEnd);
-                        return;
-                    }
+            if (exception != null) {
+                LOG.warning("Failed to read patch pack " + file, exception);
+                Controllers.dialog(i18n("patchpack.failed"), i18n("message.error"), MessageDialogPane.MessageType.ERROR);
+                Platform.runLater(controller::onEnd);
+                return;
+            }
 
-                    controller.getSettings().put(PATCH_PACK_CHARSET, loaded.charset());
-                    controller.getSettings().put(PatchPackInstallWizardProvider.PATCH_PACK_INFO, loaded.info());
+            controller.getSettings().put(PATCH_PACK_CHARSET, loaded.charset());
+            controller.getSettings().put(PatchPackInstallWizardProvider.PATCH_PACK_INFO, loaded.info());
 
-                    PatchPackInfo info = loaded.info();
-                    componentList.getContent().add(createTextPane(i18n("patchpack.name"), info.name()));
-                    if (StringUtils.isNotBlank(info.description()))
-                        componentList.getContent().add(createTextPane(i18n("patchpack.description"), info.description()));
-                    if (info.authors() != null && !info.authors().isEmpty())
-                        componentList.getContent().add(createTextPane(i18n("archive.author"), String.join(", ", info.authors())));
+            PatchPackInfo info = loaded.info();
+            componentList.getContent().add(createTextPane(i18n("patchpack.name"), info.name()));
+            if (StringUtils.isNotBlank(info.description()))
+                componentList.getContent().add(createTextPane(i18n("patchpack.description"), info.description()));
+            if (info.authors() != null && !info.authors().isEmpty())
+                componentList.getContent().add(createTextPane(i18n("archive.author"), String.join(", ", info.authors())));
 
-                    @Nullable LineTextPane versionPane = createVersionPane(info, readInstanceVersion(controller));
-                    if (versionPane != null)
-                        componentList.getContent().add(versionPane);
+            @Nullable LineTextPane versionPane = createVersionPane(info, readInstanceVersion(controller));
+            if (versionPane != null) componentList.getContent().add(versionPane);
 
-                    componentList.getContent().add(buttons);
+            componentList.getContent().add(buttons);
 
-                    if (StringUtils.isNotBlank(info.url())) {
-                        btnURL.setVisible(true);
-                        btnURL.setManaged(true);
-                        btnURL.setOnAction(e -> FXUtils.openLink(info.url()));
-                    }
+            if (StringUtils.isNotBlank(info.url())) {
+                btnURL.setVisible(true);
+                btnURL.setManaged(true);
+                btnURL.setOnAction(e -> FXUtils.openLink(info.url()));
+            }
 
-                    btnInstall.setDisable(false);
-                })
-                .start();
+            btnInstall.setDisable(false);
+        }).start();
 
         pane.getChildren().setAll(componentList);
         setContent(pane);
     }
 
-    /// Creates a read-only text pane.
-    ///
-    /// @param title the title of the pane
-    /// @param text  the text shown on the right of the pane
-    /// @return the created pane
     private static LineTextPane createTextPane(String title, String text) {
         LineTextPane pane = new LineTextPane();
         pane.setTitle(title);
@@ -152,57 +134,35 @@ public final class LocalPatchPackPage extends SpinnerPane implements WizardPage 
         return pane;
     }
 
-    /// Creates the pane describing the modpack versions this patch pack supports, and whether the
-    /// version of the target instance is one of them.
-    ///
-    /// The installation is never blocked by this check: a patch pack may still be useful for a
-    /// modpack version the launcher cannot determine, or for a version outside the declared range.
-    ///
-    /// @param info           the patch pack information
-    /// @param instanceVersion the version of the target modpack, or `null` if it is unknown
-    /// @return the created pane, or `null` if this patch pack declares no version range
     private static @Nullable LineTextPane createVersionPane(PatchPackInfo info, @Nullable String instanceVersion) {
         if (StringUtils.isBlank(info.modpackVersionRange())) {
             return null;
         }
 
+        if (instanceVersion == null) instanceVersion = i18n("message.unknown");
+
         LineTextPane pane = new LineTextPane();
         pane.setTitle(i18n("patchpack.version_range"));
-
-        if (info.parsedModpackVersionRange() == null) {
-            // The range is malformed, so it cannot be validated: show it as declared.
-            pane.setText(info.modpackVersionRange());
-            return pane;
-        }
-
-        if (instanceVersion == null) {
-            pane.setText(i18n("patchpack.version.unknown", info.modpackVersionRange()));
-            return pane;
-        }
-
+        pane.setText(i18n("patchpack.version", instanceVersion, info.modpackVersionRange()));
         if (info.isOutOfRange(instanceVersion)) {
-            // The declared range and the instance version are both shown, so that the user can
-            // decide whether this patch pack is applicable.
-            pane.setText(i18n("patchpack.version.out_of_range", instanceVersion, info.modpackVersionRange()));
-        } else {
-            pane.setText(i18n("patchpack.version.matched", info.modpackVersionRange()));
+            pane.getRightLabel().getStyleClass().add("text-warning");
         }
+
+        var translated = translateVersionRange(info.modpackVersionRange());
+        if (translated != null) {
+            pane.setText(i18n("patchpack.version", instanceVersion, translated));
+        }
+
         return pane;
     }
 
-    /// Reads the version of the modpack installed in the instance targeted by this wizard.
-    ///
-    /// @param controller the wizard controller
-    /// @return the modpack version, or `null` if it is unknown
     private static @Nullable String readInstanceVersion(WizardController controller) {
         @Nullable GameInstanceID instanceId = controller.getSettings().get(PatchPackInstallWizardProvider.INSTANCE_ID);
         HMCLGameRepository repository = controller.getSettings().get(PatchPackInstallWizardProvider.REPOSITORY);
-        if (instanceId == null || repository == null)
-            return null;
+        if (instanceId == null || repository == null) return null;
 
         @Nullable HMCLGameInstance instance = repository.findInstance(instanceId);
-        if (instance == null)
-            return null;
+        if (instance == null) return null;
 
         try {
             @Nullable ModpackConfiguration<?> configuration = instance.readModpackConfiguration();
@@ -213,10 +173,8 @@ public final class LocalPatchPackPage extends SpinnerPane implements WizardPage 
         }
     }
 
-    /// Starts the installation of the patch pack read by this page.
     private void onInstall() {
-        if (controller.getSettings().get(PatchPackInstallWizardProvider.PATCH_PACK_INFO) == null)
-            return;
+        if (controller.getSettings().get(PatchPackInstallWizardProvider.PATCH_PACK_INFO) == null) return;
 
         controller.onFinish();
     }
@@ -226,10 +184,29 @@ public final class LocalPatchPackPage extends SpinnerPane implements WizardPage 
         return i18n("patchpack.task.install");
     }
 
-    /// A patch pack information file together with the charset used to read its archive.
-    ///
-    /// @param charset the charset detected for the archive entry names
-    /// @param info    the parsed patch pack information
+    private static final Pattern VERSION_RANGE_PATTERN = Pattern.compile("([\\[(])([^,]*),?([^,]*)([\\])])");
+
+    private static @Nullable String translateVersionRange(String range) {
+        Matcher m = VERSION_RANGE_PATTERN.matcher(range.trim());
+        if (!m.matches()) {
+            return null;
+        }
+        String lower = m.group(2).trim();
+        String upper = m.group(3).trim();
+
+        if (upper.isEmpty() && !range.contains(",")) {
+            return "%s == " + lower;
+        }
+        String leftOp = m.group(1).equals("[") ? "≤" : "<";
+        String rightOp = m.group(4).equals("]") ? "≤" : "<";
+
+        if (!lower.isEmpty() && !upper.isEmpty()) return lower + " " + leftOp + " %s " + rightOp + " " + upper;
+        if (!lower.isEmpty()) return "%s " + (m.group(1).equals("[") ? "≥ " : "> ") + lower;
+        if (!upper.isEmpty()) return "%s " + (m.group(4).equals("]") ? "≤ " : "< ") + upper;
+
+        return null;
+    }
+
     private record LoadedPatchPack(Charset charset, PatchPackInfo info) {
     }
 }

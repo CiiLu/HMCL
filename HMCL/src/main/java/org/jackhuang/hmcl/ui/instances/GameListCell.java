@@ -209,7 +209,6 @@ public final class GameListCell extends ListCell<GameListItem> {
                 new IconedMenuItem(SVG.FOLDER_COPY, i18n("instance.manage.duplicate"), item::duplicate, popup),
                 new IconedMenuItem(SVG.DELETE, i18n("instance.manage.remove"), item::remove, popup),
                 new IconedMenuItem(SVG.OUTPUT, i18n("modpack.export"), item::export, popup),
-                new IconedMenuItem(SVG.GLOBE_BOOK, i18n("patchpack.task.install"), item::installPatchPack, popup),
                 new MenuSeparator(),
                 new IconedMenuItem(SVG.FOLDER_OPEN, i18n("folder.game"), item::browse, popup));
         return popup;

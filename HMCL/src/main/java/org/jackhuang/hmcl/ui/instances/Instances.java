@@ -277,9 +277,6 @@ public final class Instances {
         Controllers.getDecorator().startWizard(new ModpackInstallWizardProvider(gameInstance.getRepository(), gameInstance.getId()));
     }
 
-    /// Opens the wizard installing a patch pack into the given instance.
-    ///
-    /// @param gameInstance the instance to patch
     public static void installPatchPack(HMCLGameInstance gameInstance) {
         PatchPackInstallWizardProvider.install(gameInstance);
     }
