@@ -66,6 +66,10 @@ public class GameListItem extends GameItem {
         Instances.exportInstance(gameInstance);
     }
 
+    public void installPatchPack() {
+        Instances.installPatchPack(gameInstance);
+    }
+
     public void browse() {
         Instances.openFolder(gameInstance);
     }
