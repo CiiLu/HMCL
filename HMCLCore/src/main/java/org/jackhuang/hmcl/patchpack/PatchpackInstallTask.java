@@ -33,14 +33,14 @@ import java.util.Comparator;
 import java.util.List;
 
 @NotNullByDefault
-public final class PatchPackInstallTask extends Task<Void> {
+public final class PatchpackInstallTask extends Task<Void> {
 
     private final Path zipFile;
     private final Charset charset;
-    private final PatchPackInfo info;
+    private final PatchpackInfo info;
     private final Path destination;
 
-    public PatchPackInstallTask(Path zipFile, Charset charset, PatchPackInfo info, Path destination) {
+    public PatchpackInstallTask(Path zipFile, Charset charset, PatchpackInfo info, Path destination) {
         this.zipFile = zipFile;
         this.charset = charset;
         this.info = info;
@@ -56,7 +56,7 @@ public final class PatchPackInstallTask extends Task<Void> {
     }
 
     private void applyDiff() throws IOException {
-        PatchPackInfo.Diff diff = info.diff();
+        PatchpackInfo.Diff diff = info.diff();
         if (diff == null)
             return;
 
@@ -77,7 +77,7 @@ public final class PatchPackInstallTask extends Task<Void> {
         }
 
         if (diff.rename() != null) {
-            for (PatchPackInfo.Diff.Rename rename : diff.rename()) {
+            for (PatchpackInfo.Diff.Rename rename : diff.rename()) {
                 Path from = resolveInside(rename.from());
                 if (!Files.exists(from))
                     continue;
@@ -104,7 +104,7 @@ public final class PatchPackInstallTask extends Task<Void> {
         new Unzipper(zipFile, destination)
                 .setReplaceExistentFile(true)
                 .setEncoding(charset)
-                .setFilter((entry, destFile, relativePath) -> !PatchPackInfo.FILE_NAME.equals(relativePath))
+                .setFilter((entry, destFile, relativePath) -> !PatchpackInfo.FILE_NAME.equals(relativePath))
                 .unzip();
     }
 

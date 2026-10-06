@@ -26,7 +26,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.SVGPath;
 import javafx.stage.FileChooser;
-import org.jackhuang.hmcl.patchpack.PatchPackHelper;
+import org.jackhuang.hmcl.patchpack.PatchpackHelper;
 import org.jackhuang.hmcl.task.FileDownloadTask;
 import org.jackhuang.hmcl.task.Schedulers;
 import org.jackhuang.hmcl.ui.Controllers;
@@ -70,8 +70,8 @@ public final class PatchPackSelectionPage extends VBox implements WizardPage {
                 createButton("remote", this::onChooseRemoteFile)
         );
 
-        FXUtils.applyDragListener(this, PatchPackHelper::isPatchPackByExtension, files -> {
-            controller.getSettings().put(PatchPackInstallWizardProvider.PATCH_PACK_FILE, files.get(0));
+        FXUtils.applyDragListener(this, PatchpackHelper::isPatchPackByExtension, files -> {
+            controller.getSettings().put(PatchpackInstallWizardProvider.PATCH_PACK_FILE, files.get(0));
             controller.onNext();
         });
     }
@@ -113,7 +113,7 @@ public final class PatchPackSelectionPage extends VBox implements WizardPage {
         if (selectedFile == null)
             return;
 
-        controller.getSettings().put(PatchPackInstallWizardProvider.PATCH_PACK_FILE, selectedFile);
+        controller.getSettings().put(PatchpackInstallWizardProvider.PATCH_PACK_FILE, selectedFile);
         controller.onNext();
     }
 
@@ -138,7 +138,7 @@ public final class PatchPackSelectionPage extends VBox implements WizardPage {
                                 .whenComplete(Schedulers.javafx(), e -> {
                                     if (e == null) {
                                         handler.resolve();
-                                        controller.getSettings().put(PatchPackInstallWizardProvider.PATCH_PACK_FILE, patchPack);
+                                        controller.getSettings().put(PatchpackInstallWizardProvider.PATCH_PACK_FILE, patchPack);
                                         controller.onNext();
                                     } else {
                                         // The download task also reports cancellation as a failure.

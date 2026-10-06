@@ -21,8 +21,8 @@ import javafx.scene.Node;
 import org.jackhuang.hmcl.game.GameInstanceID;
 import org.jackhuang.hmcl.game.HMCLGameInstance;
 import org.jackhuang.hmcl.game.HMCLGameRepository;
-import org.jackhuang.hmcl.patchpack.PatchPackHelper;
-import org.jackhuang.hmcl.patchpack.PatchPackInfo;
+import org.jackhuang.hmcl.patchpack.PatchpackHelper;
+import org.jackhuang.hmcl.patchpack.PatchpackInfo;
 import org.jackhuang.hmcl.ui.Controllers;
 import org.jackhuang.hmcl.ui.construct.MessageDialogPane;
 import org.jackhuang.hmcl.ui.wizard.WizardController;
@@ -38,25 +38,25 @@ import java.nio.file.Path;
 import static org.jackhuang.hmcl.util.i18n.I18n.i18n;
 
 @NotNullByDefault
-public final class PatchPackInstallWizardProvider implements WizardProvider {
+public final class PatchpackInstallWizardProvider implements WizardProvider {
     public static final SettingsMap.Key<GameInstanceID> INSTANCE_ID = new SettingsMap.Key<>("PATCH_PACK_INSTANCE_ID");
     public static final SettingsMap.Key<HMCLGameRepository> REPOSITORY = new SettingsMap.Key<>("PATCH_PACK_REPOSITORY");
     public static final SettingsMap.Key<Path> PATCH_PACK_FILE = new SettingsMap.Key<>("PATCH_PACK_FILE");
-    public static final SettingsMap.Key<PatchPackInfo> PATCH_PACK_INFO = new SettingsMap.Key<>("PATCH_PACK_INFO");
+    public static final SettingsMap.Key<PatchpackInfo> PATCH_PACK_INFO = new SettingsMap.Key<>("PATCH_PACK_INFO");
 
     private final HMCLGameRepository repository;
     private final GameInstanceID instanceId;
     private final @Nullable Path file;
 
-    public PatchPackInstallWizardProvider(HMCLGameInstance gameInstance) {
+    public PatchpackInstallWizardProvider(HMCLGameInstance gameInstance) {
         this(gameInstance.getRepository(), gameInstance.getId(), null);
     }
 
-    public PatchPackInstallWizardProvider(HMCLGameInstance gameInstance, Path file) {
+    public PatchpackInstallWizardProvider(HMCLGameInstance gameInstance, Path file) {
         this(gameInstance.getRepository(), gameInstance.getId(), file);
     }
 
-    private PatchPackInstallWizardProvider(HMCLGameRepository repository, GameInstanceID instanceId, @Nullable Path file) {
+    private PatchpackInstallWizardProvider(HMCLGameRepository repository, GameInstanceID instanceId, @Nullable Path file) {
         this.repository = repository;
         this.instanceId = instanceId;
         this.file = file;
@@ -88,7 +88,7 @@ public final class PatchPackInstallWizardProvider implements WizardProvider {
     @Override
     public Object finish(SettingsMap settings) {
         Path selected = settings.get(PATCH_PACK_FILE);
-        PatchPackInfo info = settings.get(PATCH_PACK_INFO);
+        PatchpackInfo info = settings.get(PATCH_PACK_INFO);
         @Nullable Charset charset = settings.get(LocalPatchPackPage.PATCH_PACK_CHARSET);
         if (selected == null || info == null || charset == null)
             return null;
@@ -105,7 +105,7 @@ public final class PatchPackInstallWizardProvider implements WizardProvider {
                 Controllers.dialog(StringUtils.getStackTrace(exception), i18n("install.failed"), MessageDialogPane.MessageType.ERROR, next));
 
         Path runDirectory = instance.getRunDirectory();
-        return PatchPackHelper.getInstallTask(selected, charset, info, runDirectory)
+        return PatchpackHelper.getInstallTask(selected, charset, info, runDirectory)
                 .setName(i18n("install.patchpack"))
                 .thenComposeAsync(repository.refreshAsync());
     }
@@ -116,10 +116,10 @@ public final class PatchPackInstallWizardProvider implements WizardProvider {
     }
 
     public static void install(HMCLGameInstance gameInstance) {
-        Controllers.getDecorator().startWizard(new PatchPackInstallWizardProvider(gameInstance), i18n("patchpack.task.install"));
+        Controllers.getDecorator().startWizard(new PatchpackInstallWizardProvider(gameInstance), i18n("patchpack.task.install"));
     }
 
     public static void install(HMCLGameInstance gameInstance, Path file) {
-        Controllers.getDecorator().startWizard(new PatchPackInstallWizardProvider(gameInstance, file), i18n("patchpack.task.install"));
+        Controllers.getDecorator().startWizard(new PatchpackInstallWizardProvider(gameInstance, file), i18n("patchpack.task.install"));
     }
 }

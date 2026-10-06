@@ -26,8 +26,8 @@ import org.jackhuang.hmcl.game.GameInstanceID;
 import org.jackhuang.hmcl.game.HMCLGameInstance;
 import org.jackhuang.hmcl.game.HMCLGameRepository;
 import org.jackhuang.hmcl.modpack.ModpackConfiguration;
-import org.jackhuang.hmcl.patchpack.PatchPackHelper;
-import org.jackhuang.hmcl.patchpack.PatchPackInfo;
+import org.jackhuang.hmcl.patchpack.PatchpackHelper;
+import org.jackhuang.hmcl.patchpack.PatchpackInfo;
 import org.jackhuang.hmcl.task.Schedulers;
 import org.jackhuang.hmcl.task.Task;
 import org.jackhuang.hmcl.ui.Controllers;
@@ -79,7 +79,7 @@ public final class LocalPatchPackPage extends SpinnerPane implements WizardPage 
         buttons.setLeft(btnURL);
         buttons.setRight(btnInstall);
 
-        Path file = controller.getSettings().get(PatchPackInstallWizardProvider.PATCH_PACK_FILE);
+        Path file = controller.getSettings().get(PatchpackInstallWizardProvider.PATCH_PACK_FILE);
         if (file == null) {
             Controllers.dialog(i18n("patchpack.failed"), i18n("message.error"), MessageDialogPane.MessageType.ERROR);
             FXUtils.runInFX(controller::onEnd);
@@ -89,7 +89,7 @@ public final class LocalPatchPackPage extends SpinnerPane implements WizardPage 
         }
 
         showSpinner();
-        Task.supplyAsync(() -> PatchPackHelper.findSuitableEncoding(file)).thenApplyAsync(encoding -> new LoadedPatchPack(encoding, PatchPackHelper.readPatchPackInfo(file, encoding))).whenComplete(Schedulers.javafx(), (loaded, exception) -> {
+        Task.supplyAsync(() -> PatchpackHelper.findSuitableEncoding(file)).thenApplyAsync(encoding -> new LoadedPatchPack(encoding, PatchpackHelper.readPatchPackInfo(file, encoding))).whenComplete(Schedulers.javafx(), (loaded, exception) -> {
             hideSpinner();
 
             if (exception != null) {
@@ -100,9 +100,9 @@ public final class LocalPatchPackPage extends SpinnerPane implements WizardPage 
             }
 
             controller.getSettings().put(PATCH_PACK_CHARSET, loaded.charset());
-            controller.getSettings().put(PatchPackInstallWizardProvider.PATCH_PACK_INFO, loaded.info());
+            controller.getSettings().put(PatchpackInstallWizardProvider.PATCH_PACK_INFO, loaded.info());
 
-            PatchPackInfo info = loaded.info();
+            PatchpackInfo info = loaded.info();
             componentList.getContent().add(createTextPane(i18n("patchpack.name"), info.name()));
             if (StringUtils.isNotBlank(info.description()))
                 componentList.getContent().add(createTextPane(i18n("patchpack.description"), info.description()));
@@ -134,7 +134,7 @@ public final class LocalPatchPackPage extends SpinnerPane implements WizardPage 
         return pane;
     }
 
-    private static @Nullable LineTextPane createVersionPane(PatchPackInfo info, @Nullable String instanceVersion) {
+    private static @Nullable LineTextPane createVersionPane(PatchpackInfo info, @Nullable String instanceVersion) {
         if (StringUtils.isBlank(info.modpackVersionRange())) {
             return null;
         }
@@ -158,8 +158,8 @@ public final class LocalPatchPackPage extends SpinnerPane implements WizardPage 
     }
 
     private static @Nullable String readInstanceVersion(WizardController controller) {
-        @Nullable GameInstanceID instanceId = controller.getSettings().get(PatchPackInstallWizardProvider.INSTANCE_ID);
-        HMCLGameRepository repository = controller.getSettings().get(PatchPackInstallWizardProvider.REPOSITORY);
+        @Nullable GameInstanceID instanceId = controller.getSettings().get(PatchpackInstallWizardProvider.INSTANCE_ID);
+        HMCLGameRepository repository = controller.getSettings().get(PatchpackInstallWizardProvider.REPOSITORY);
         if (instanceId == null || repository == null) return null;
 
         @Nullable HMCLGameInstance instance = repository.findInstance(instanceId);
@@ -175,7 +175,7 @@ public final class LocalPatchPackPage extends SpinnerPane implements WizardPage 
     }
 
     private void onInstall() {
-        if (controller.getSettings().get(PatchPackInstallWizardProvider.PATCH_PACK_INFO) == null) return;
+        if (controller.getSettings().get(PatchpackInstallWizardProvider.PATCH_PACK_INFO) == null) return;
 
         controller.onFinish();
     }
@@ -208,6 +208,6 @@ public final class LocalPatchPackPage extends SpinnerPane implements WizardPage 
         return null;
     }
 
-    private record LoadedPatchPack(Charset charset, PatchPackInfo info) {
+    private record LoadedPatchPack(Charset charset, PatchpackInfo info) {
     }
 }

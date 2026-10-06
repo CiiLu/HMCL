@@ -29,9 +29,9 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 
-public final class PatchPackHelper {
+public final class PatchpackHelper {
 
-    private PatchPackHelper() {
+    private PatchpackHelper() {
         throw new AssertionError();
     }
 
@@ -43,34 +43,34 @@ public final class PatchPackHelper {
         return CompressingUtils.findSuitableEncoding(file);
     }
 
-    public static PatchPackInfo readPatchPackInfo(Path file, @Nullable Charset charset) throws IOException {
+    public static PatchpackInfo readPatchPackInfo(Path file, @Nullable Charset charset) throws IOException {
         Charset encoding = charset != null ? charset : findSuitableEncoding(file);
 
         String json;
         try (var zip = CompressingUtils.openZipFile(file, encoding)) {
-            var entry = zip.getEntry(PatchPackInfo.FILE_NAME);
+            var entry = zip.getEntry(PatchpackInfo.FILE_NAME);
             if (entry == null)
-                throw new IOException("Missing " + PatchPackInfo.FILE_NAME + " in the patch pack");
+                throw new IOException("Missing " + PatchpackInfo.FILE_NAME + " in the patch pack");
 
             try (InputStream input = zip.getInputStream(entry)) {
                 json = new String(input.readAllBytes(), StandardCharsets.UTF_8);
             }
         }
 
-        PatchPackInfo info;
+        PatchpackInfo info;
         try {
-            info = JsonUtils.fromJson(json, PatchPackInfo.class);
+            info = JsonUtils.fromJson(json, PatchpackInfo.class);
         } catch (JsonParseException e) {
-            throw new IOException("Malformed " + PatchPackInfo.FILE_NAME, e);
+            throw new IOException("Malformed " + PatchpackInfo.FILE_NAME, e);
         }
 
         if (info == null)
-            throw new IOException("Empty " + PatchPackInfo.FILE_NAME);
+            throw new IOException("Empty " + PatchpackInfo.FILE_NAME);
 
         return info;
     }
 
-    public static PatchPackInstallTask getInstallTask(Path zipFile, Charset charset, PatchPackInfo info, Path runDirectory) {
-        return new PatchPackInstallTask(zipFile, charset, info, runDirectory);
+    public static PatchpackInstallTask getInstallTask(Path zipFile, Charset charset, PatchpackInfo info, Path runDirectory) {
+        return new PatchpackInstallTask(zipFile, charset, info, runDirectory);
     }
 }

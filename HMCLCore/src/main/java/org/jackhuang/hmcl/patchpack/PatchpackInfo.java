@@ -25,7 +25,7 @@ import org.jetbrains.annotations.Unmodifiable;
 
 import java.util.List;
 
-public record PatchPackInfo(@SerializedName("formatVersion") int formatVersion,
+public record PatchpackInfo(@SerializedName("formatVersion") int formatVersion,
                             @SerializedName("name") @NotNull String name,
                             @SerializedName("description") @Nullable String description,
                             @SerializedName("modpackVersionRange") @Nullable String modpackVersionRange,

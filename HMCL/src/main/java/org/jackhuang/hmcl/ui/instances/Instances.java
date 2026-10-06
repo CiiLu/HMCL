@@ -47,7 +47,7 @@ import org.jackhuang.hmcl.ui.construct.PromptDialogPane;
 import org.jackhuang.hmcl.ui.construct.Validator;
 import org.jackhuang.hmcl.ui.download.ModpackInstallWizardProvider;
 import org.jackhuang.hmcl.ui.export.ExportWizardProvider;
-import org.jackhuang.hmcl.ui.patchpack.PatchPackInstallWizardProvider;
+import org.jackhuang.hmcl.ui.patchpack.PatchpackInstallWizardProvider;
 import org.jackhuang.hmcl.util.StringUtils;
 import org.jackhuang.hmcl.util.TaskCancellationAction;
 import org.jackhuang.hmcl.util.gson.JsonUtils;
@@ -278,7 +278,7 @@ public final class Instances {
     }
 
     public static void installPatchPack(HMCLGameInstance gameInstance) {
-        PatchPackInstallWizardProvider.install(gameInstance);
+        PatchpackInstallWizardProvider.install(gameInstance);
     }
 
     public static void updateGameAssets(HMCLGameInstance gameInstance) {
