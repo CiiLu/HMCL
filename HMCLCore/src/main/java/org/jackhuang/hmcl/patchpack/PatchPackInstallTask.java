@@ -46,7 +46,7 @@ public final class PatchPackInstallTask extends Task<Void> {
         this.info = info;
         this.destination = destination;
 
-        setStage("install.patchpack");
+        setStage("hmcl.patchpack");
     }
 
     @Override

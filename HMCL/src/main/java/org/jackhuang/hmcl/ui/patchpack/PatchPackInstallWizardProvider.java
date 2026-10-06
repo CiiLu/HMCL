@@ -37,41 +37,21 @@ import java.nio.file.Path;
 
 import static org.jackhuang.hmcl.util.i18n.I18n.i18n;
 
-/// Drives the wizard installing a patch pack into an existing instance.
-///
-/// Unlike the modpack installation wizard, the target instance is fixed when the wizard starts:
-/// a patch pack is always extracted over the run directory of the instance the user selected, so
-/// no page asks for an instance name.
 @NotNullByDefault
 public final class PatchPackInstallWizardProvider implements WizardProvider {
-
-    /// The key of the target instance id in the wizard settings.
-    static final SettingsMap.Key<GameInstanceID> INSTANCE_ID = new SettingsMap.Key<>("PATCH_PACK_INSTANCE_ID");
-
-    /// The key of the repository containing the target instance in the wizard settings.
-    static final SettingsMap.Key<HMCLGameRepository> REPOSITORY = new SettingsMap.Key<>("PATCH_PACK_REPOSITORY");
-
-    /// The key of the archive to install in the wizard settings.
-    static final SettingsMap.Key<Path> PATCH_PACK_FILE = new SettingsMap.Key<>("PATCH_PACK_FILE");
-
-    /// The key of the parsed patch pack information in the wizard settings.
-    static final SettingsMap.Key<PatchPackInfo> PATCH_PACK_INFO = new SettingsMap.Key<>("PATCH_PACK_INFO");
+    public static final SettingsMap.Key<GameInstanceID> INSTANCE_ID = new SettingsMap.Key<>("PATCH_PACK_INSTANCE_ID");
+    public static final SettingsMap.Key<HMCLGameRepository> REPOSITORY = new SettingsMap.Key<>("PATCH_PACK_REPOSITORY");
+    public static final SettingsMap.Key<Path> PATCH_PACK_FILE = new SettingsMap.Key<>("PATCH_PACK_FILE");
+    public static final SettingsMap.Key<PatchPackInfo> PATCH_PACK_INFO = new SettingsMap.Key<>("PATCH_PACK_INFO");
 
     private final HMCLGameRepository repository;
     private final GameInstanceID instanceId;
     private final @Nullable Path file;
 
-    /// Creates a wizard provider whose first page lets the user choose the patch pack archive.
-    ///
-    /// @param gameInstance the instance the patch pack is installed into
     public PatchPackInstallWizardProvider(HMCLGameInstance gameInstance) {
         this(gameInstance.getRepository(), gameInstance.getId(), null);
     }
 
-    /// Creates a wizard provider that installs the given archive without asking for it.
-    ///
-    /// @param gameInstance the instance the patch pack is installed into
-    /// @param file         the patch pack archive
     public PatchPackInstallWizardProvider(HMCLGameInstance gameInstance, Path file) {
         this(gameInstance.getRepository(), gameInstance.getId(), file);
     }
@@ -126,6 +106,7 @@ public final class PatchPackInstallWizardProvider implements WizardProvider {
 
         Path runDirectory = instance.getRunDirectory();
         return PatchPackHelper.getInstallTask(selected, charset, info, runDirectory)
+                .setName(i18n("install.patchpack"))
                 .thenComposeAsync(repository.refreshAsync());
     }
 
@@ -134,17 +115,10 @@ public final class PatchPackInstallWizardProvider implements WizardProvider {
         return true;
     }
 
-    /// Starts the wizard installing a patch pack into the given instance.
-    ///
-    /// @param gameInstance the instance to patch
     public static void install(HMCLGameInstance gameInstance) {
         Controllers.getDecorator().startWizard(new PatchPackInstallWizardProvider(gameInstance), i18n("patchpack.task.install"));
     }
 
-    /// Starts the wizard installing the given patch pack archive.
-    ///
-    /// @param gameInstance the instance to patch
-    /// @param file         the patch pack archive
     public static void install(HMCLGameInstance gameInstance, Path file) {
         Controllers.getDecorator().startWizard(new PatchPackInstallWizardProvider(gameInstance, file), i18n("patchpack.task.install"));
     }
