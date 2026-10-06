@@ -113,7 +113,6 @@ public final class PatchPackInstallWizardProvider implements WizardProvider {
         if (selected == null || info == null || charset == null)
             return null;
 
-        // The instance may have been removed while the wizard was open.
         @Nullable HMCLGameInstance instance = repository.findInstance(instanceId);
         if (instance == null) {
             Controllers.dialog(i18n("instance.empty"), i18n("message.error"), MessageDialogPane.MessageType.ERROR);

@@ -32,34 +32,21 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-/// Installs a patch pack by applying its file operations and then extracting its content over the
-/// run directory of an existing instance.
-///
-/// The file operations declared by [PatchPackInfo#diff()] are executed before the archive content is
-/// extracted, so that a patch pack can remove or move the files it replaces. Files that are already
-/// present in the target directory and are not part of the patch pack are left untouched.
 @NotNullByDefault
 public final class PatchPackInstallTask extends Task<Void> {
-
-    /// The prefix of the archive entries that are never extracted.
-    private static final String META_INF = "META-INF/";
 
     private final Path zipFile;
     private final Charset charset;
     private final PatchPackInfo info;
     private final Path destination;
 
-    /// Creates an install task.
-    ///
-    /// @param zipFile     the patch pack archive
-    /// @param charset     the charset used to decode the names of the archive entries
-    /// @param info        the patch pack information read from `zipFile`
-    /// @param destination the run directory of the target instance
     public PatchPackInstallTask(Path zipFile, Charset charset, PatchPackInfo info, Path destination) {
         this.zipFile = zipFile;
         this.charset = charset;
         this.info = info;
         this.destination = destination;
+
+        setStage("install.patchpack");
     }
 
     @Override
@@ -68,12 +55,6 @@ public final class PatchPackInstallTask extends Task<Void> {
         extract();
     }
 
-    /// Applies the delete and rename operations declared by the patch pack.
-    ///
-    /// Deletions are executed before renames, and paths are deleted from the deepest to the
-    /// shallowest one, so that deleting a directory cannot drop the destination of a rename.
-    ///
-    /// @throws IOException if a file operation fails
     private void applyDiff() throws IOException {
         PatchPackInfo.Diff diff = info.diff();
         if (diff == null)
@@ -86,8 +67,6 @@ public final class PatchPackInstallTask extends Task<Void> {
             }
         }
 
-        // Delete directories after their children, otherwise deleting a directory would remove
-        // files that are only listed later in `diff.delete`.
         deleteTargets.sort(Comparator.comparingInt(Path::getNameCount).reversed());
         for (Path path : deleteTargets) {
             if (Files.isDirectory(path)) {
@@ -108,8 +87,6 @@ public final class PatchPackInstallTask extends Task<Void> {
                 if (parent != null)
                     Files.createDirectories(parent);
 
-                // Move the target away first, because moving a directory into an existing directory
-                // would nest it instead of replacing it on most platforms.
                 if (Files.isDirectory(to)) {
                     FileUtils.deleteDirectory(to);
                 } else {
@@ -121,37 +98,19 @@ public final class PatchPackInstallTask extends Task<Void> {
         }
     }
 
-    /// Extracts the patch pack archive over the destination directory.
-    ///
-    /// @throws IOException if the archive is malformed or a file cannot be written
     private void extract() throws IOException {
         Files.createDirectories(destination);
 
         new Unzipper(zipFile, destination)
                 .setReplaceExistentFile(true)
                 .setEncoding(charset)
-                .setFilter((entry, destFile, relativePath) -> {
-                    // The information file is metadata of the patch pack, it must not pollute the
-                    // instance directory. META-INF belongs to the archive itself, not to the
-                    // instance, so its content is never extracted either.
-                    return !PatchPackInfo.FILE_NAME.equals(relativePath)
-                            && !relativePath.startsWith(META_INF);
-                })
+                .setFilter((entry, destFile, relativePath) -> !PatchPackInfo.FILE_NAME.equals(relativePath))
                 .unzip();
     }
 
-    /// Resolves a path declared by the patch pack against the destination directory.
-    ///
-    /// @param path the relative path declared in `patchpackinfo.json`
-    /// @return the absolute normalized path
-    /// @throws IOException if `path` is empty or points outside of the destination directory
     private Path resolveInside(String path) throws IOException {
         Path base = destination.toAbsolutePath().normalize();
-        // The path is normalized after being resolved, because FileUtils.normalizePath would drop
-        // the drive letter of an absolute Windows path such as "C:/instance".
         Path resolved = base.resolve(path).toAbsolutePath().normalize();
-        // An empty path denotes the instance directory itself, which a patch pack must never
-        // delete or move.
         if (resolved.equals(base) || !resolved.startsWith(base))
             throw new IOException("Patch pack is trying to access a path outside of the instance directory: " + path);
         return resolved;

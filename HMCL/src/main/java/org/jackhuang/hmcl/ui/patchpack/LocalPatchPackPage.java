@@ -143,14 +143,15 @@ public final class LocalPatchPackPage extends SpinnerPane implements WizardPage 
 
         LineTextPane pane = new LineTextPane();
         pane.setTitle(i18n("patchpack.version_range"));
-        pane.setText(i18n("patchpack.version", instanceVersion, info.modpackVersionRange()));
+        pane.setText(i18n("patchpack.version", info.modpackVersionRange(), instanceVersion));
         if (info.isOutOfRange(instanceVersion)) {
-            pane.getRightLabel().getStyleClass().add("text-warning");
+            System.out.println(1111111111);
+            pane.getRightLabel().setStyle("-fx-text-fill: -monet-tertiary-fixed-dim;");
         }
 
         var translated = translateVersionRange(info.modpackVersionRange());
         if (translated != null) {
-            pane.setText(i18n("patchpack.version", instanceVersion, translated));
+            pane.setText(i18n("patchpack.version", String.format(translated, i18n("patchpack.target_version")), instanceVersion));
         }
 
         return pane;
