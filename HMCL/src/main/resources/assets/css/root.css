@@ -42,7 +42,7 @@
 }
 
 .text-warning {
-    -fx-text-fill: -monet-tertiary-fixed-dim;
+    -fx-text-fill: -monet-tertiary;
 }
 
 .hyperlink {

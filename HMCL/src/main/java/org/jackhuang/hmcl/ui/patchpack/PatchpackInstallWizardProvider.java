@@ -81,10 +81,12 @@ public final class PatchpackInstallWizardProvider implements WizardProvider {
         return switch (step) {
             case 0 -> new PatchPackSelectionPage(controller);
             case 1 -> new LocalPatchPackPage(controller);
-            default -> throw new IllegalStateException("error step " + step + ", settings: " + settings + ", pages: " + controller.getPages());
+            default ->
+                    throw new IllegalStateException("error step " + step + ", settings: " + settings + ", pages: " + controller.getPages());
         };
     }
 
+    @Nullable
     @Override
     public Object finish(SettingsMap settings) {
         Path selected = settings.get(PATCH_PACK_FILE);
