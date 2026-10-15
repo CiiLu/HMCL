@@ -20,6 +20,7 @@ package org.jackhuang.hmcl.ui;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXListView;
 import com.jfoenix.controls.JFXTextField;
+import com.jfoenix.skins.JFXTextFieldSkin;
 import javafx.animation.PauseTransition;
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
@@ -64,6 +65,8 @@ public abstract class ToolbarListPageSkin<E, P extends ListPageBase<E>> extends 
 
     protected final BooleanProperty isSearching = new SimpleBooleanProperty(false);
     protected final BooleanProperty isSelecting = new SimpleBooleanProperty(false);
+
+    private boolean typingFirstWord;
 
     public ToolbarListPageSkin(P skinnable, boolean hasSearch) {
         super(skinnable);
@@ -112,6 +115,7 @@ public abstract class ToolbarListPageSkin<E, P extends ListPageBase<E>> extends 
                 searchPause.stop();
                 filteredList.setPredicate(null);
                 isSearching.set(false);
+                listView.requestFocus();
             });
 
             FXUtils.onEscPressed(searchField, closeSearchBar::fire);
@@ -119,6 +123,32 @@ public abstract class ToolbarListPageSkin<E, P extends ListPageBase<E>> extends 
             searchBar.setAlignment(Pos.CENTER);
             searchBar.setPadding(new Insets(0, 5, 0, 5));
             searchBar.getChildren().setAll(searchField, closeSearchBar);
+
+            // type to search
+            searchField.setSkin(new JFXTextFieldSkin(searchField)); // init searchField
+            listView.inputMethodRequestsProperty().bind(searchField.inputMethodRequestsProperty());
+            listView.setOnInputMethodTextChanged(e -> { // ime
+                typingFirstWord = !e.getComposed().isEmpty();
+                listView.getSelectionModel().clearSelection();
+                isSearching.set(true);
+                searchField.fireEvent(e.copyFor(searchField, searchField));
+                // Changing the IME client during native event dispatch can interrupt the first commit.
+                if (!typingFirstWord)
+                    Platform.runLater(() -> {
+                        searchField.requestFocus();
+                        searchField.positionCaret(searchField.getLength());
+                    });
+                e.consume();
+            });
+            listView.addEventHandler(KeyEvent.KEY_TYPED, e -> { // char
+                if (e.getCharacter().isEmpty() || e.getCharacter().codePoints().anyMatch(Character::isISOControl))
+                    return;
+                listView.getSelectionModel().clearSelection();
+                isSearching.set(true);
+                searchField.fireEvent(e.copyFor(searchField, searchField));
+                Platform.runLater(() -> searchField.positionCaret(searchField.getLength()));
+                e.consume();
+            });
         } else {
             Bindings.bindContent(listView.getItems(), skinnable.itemsProperty());
         }
@@ -207,7 +237,7 @@ public abstract class ToolbarListPageSkin<E, P extends ListPageBase<E>> extends 
         Node oldToolbar = toolbarPane.getCurrentNode();
         if (newToolbar != oldToolbar) {
             toolbarPane.setContent(newToolbar, ContainerAnimations.FADE);
-            if (newToolbar == searchBar && searchField != null) {
+            if (newToolbar == searchBar && !typingFirstWord && searchField != null) {
                 Platform.runLater(searchField::requestFocus);
             }
         }
